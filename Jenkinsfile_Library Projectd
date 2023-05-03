@@ -1,0 +1,41 @@
+
+@Library('adjinsharedlibrary') _
+pipeline{
+    agent any
+    tools{
+        maven "maven3.8.8"
+    }
+    
+    stages{
+        stage("1. Git clone from repo"){
+          steps{
+           sh "echo start of git clone"
+           git branch: 'main', credentialsId: 'Git_Credentials', url: 'https://github.com/ADJIN-TETTEY/adjin-tettey-web-app.git'
+           sh "echo end of git clone"
+          }
+        }
+        
+        stage("2. Build from maven"){
+            steps{
+                sh "echo start building from Maven"
+                common("Build")
+                sh "echo end of build"
+            }
+        }
+        
+        stage("3. Code scan quality assurance"){
+            steps{
+                sh "echo sart of code scan"
+                common("Code Quality Report")
+                sh "echo end of code scan"
+            }
+        }
+        
+        stage("4. Store Artifact"){
+            steps{
+                sh "echo Deploy Artifact"
+                common("Upload Into Nexus")
+            }
+        }
+    }
+}
